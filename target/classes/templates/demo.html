@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>demo</title>
+<link href="../easyui/themes/icon.css" rel="stylesheet" />
+<link href="../easyui/themes/bootstrap/easyui.css" rel="stylesheet" />
+<link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<script src="../jquery/jquery-1.9.1.min.js"></script>
+<script src="../bootstrap/js/bootstrap.min.js"></script>
+<script src="../easyui/jquery.easyui.min.js"></script>
+<script src="../easyui/locale/easyui-lang-zh_Cn.js"></script>
+</head>
+<body>
+<div class="container">
+		<div class="fixContainer">
+			<div id="toolbar" style="padding: 10px;">
+				<form id="queryfm" style="margin: 0">
+				   <input type='text' style='display:none'/><!--防止单input自动提交  -->
+					dm_str：<input type="text" name="dm_str" class="easyui-validatebox"
+						style="max-width: 150px" /> <a class="easyui-linkbutton"
+						data-options="iconCls:'icon-search'" onclick="doQuery()">查询</a> <a
+						class="easyui-linkbutton" data-options="iconCls:'icon-data'"
+						onclick="doMore()">更多条件</a>
+					<hr />
+					<a class="easyui-linkbutton" data-options="iconCls:'icon-add'"
+						onclick="addDemotab1()">增加</a> <a class="easyui-linkbutton"
+						data-options="iconCls:'icon-edit'" onclick="editDemotab1()">修改</a>
+					<a class="easyui-linkbutton" data-options="iconCls:'icon-remove'"
+						onclick="delDemotab1()">删除</a>
+					<a class="easyui-linkbutton" data-options="iconCls:'icon-add'"
+						onclick="easyuiStyle()">easyui布局示例</a>
+					<a class="easyui-linkbutton" data-options="iconCls:'icon-man'"
+						onclick="demoUserInfo()">DemoUserInfo</a>
+				</form>
+			</div>
+
+			<table id="data1" class="easyui-datagrid"
+				data-options="cls:'content',
+     	fit:true,rownumbers:true,toolbar:'#toolbar',
+     	url:'',pagination:true,singleSelect:true">
+				<thead>
+					<tr class="header">
+						<th data-options="field:'auto_id',align:'right',width:80">auto_id</th>
+						<th data-options="field:'dm_uid',width:250">dm_uid</th>
+						<th data-options="field:'dm_str',align:'center',width:150,sortable:true">
+							dm_str</th>
+						<th data-options="field:'dm_int',align:'right',width:80,sortable:true">
+							dm_int</th>
+						<th data-options="field:'dm_num',align:'right',width:80">
+							dm_num</th>
+						<th data-options="field:'dm_date',align:'center',width:150">dm_date</th>
+						<th data-options="field:'dm_time',align:'center',width:200">dm_time</th>
+						<th data-options="field:'dm_param',align:'center',width:200">dm_param</th>
+					</tr>
+				</thead>
+			</table>
+
+			<!-- 编辑窗口 -->
+			<div id="dlg" class="easyui-dialog small_easyui_dlg"
+				data-options="closed:true,resizable:true,modal:true,
+				buttons:[
+				{ text:'保存',iconCls:'icon-ok',	   id:'addBtn', handler:function(){saveData();}                   },
+				{ text:'取消',iconCls:'icon-cancel',	handler:function(){$('#dlg').dialog('close');}  }]"
+				style="padding: 20px;">
+
+				<form id="fm" method="post" class="easyuidlg">
+
+					<div class="form-group">
+						<label> dmStr： </label> <input type="text" name="dm_str"
+							class="easyui-validatebox" />
+					</div>
+					<div class="form-group">
+						<label> dmInt： </label> <input type="text" name="dm_int"
+							class="easyui-validatebox"
+							data-options="required:true,validType:'positiveInt'" />
+					</div>
+					<div class="form-group">
+						<label> dmNum： </label> <input type="text" name="dm_num"
+							class="easyui-validatebox"
+							data-options="required:true,validType:'numeric'" />
+					</div>
+					<div class="form-group">
+						<label> dmDate： </label> <input type="text" name="dm_date"
+							class="easyui-datebox" style="width: 75%;" />
+					</div>
+					<div class="form-group">
+						<label> dmTime： </label> <input type="text" name="dm_time"
+							class="easyui-datetimebox" style="width: 75%;" />
+					</div>
+					<!-- 					//关于token的问题 -->
+					<sec:csrfInput />
+					<input type="hidden" name="dm_uid" />
+				</form>
+
+			</div>
+
+			<div id="queryDlg" class="easyui-dialog small_easyui_dlg"
+				data-options="closed:true,resizable:true,modal:true,title:'更多查询条件',
+				buttons:[
+				{ text:'查询',iconCls:'icon-search',	   id:'queryBtn', handler:function(){queryMore();}                   },
+				{ text:'取消',iconCls:'icon-cancel',	handler:function(){$('#queryDlg').dialog('close');}  }]"
+				style="padding: 20px;">
+
+				<form id="queryfm2" method="post" class="easyuidlg">
+
+				
+					<div class="form-group">
+						<label> dmInt： </label> <input type="text" name="dm_int_st"
+							class="easyui-validatebox"
+							data-options="validType:'positiveInt'" />
+					</div>
+					<div class="form-group">
+						<label> 至： </label> <input type="text" name="dm_int_ed"
+							class="easyui-validatebox"
+							data-options="validType:'positiveInt'" />
+					</div>
+					<div class="form-group">
+						<label> dmNum： </label> <input type="text" name="dm_num_st"
+							class="easyui-validatebox"
+							data-options="validType:'numeric'" />
+					</div>
+					<div class="form-group">
+						<label>  至： </label> <input type="text" name="dm_num_ed"
+							class="easyui-validatebox"
+							data-options="validType:'numeric'" />
+					</div>
+					<div class="form-group">
+						<label> dmDate： </label> <input type="text" name="dm_date_st"
+							class="easyui-datebox" style="width: 75%;" />
+					</div>
+					<div class="form-group">
+						<label>至 ：</label> <input type="text" name="dm_date_ed"
+							class="easyui-datebox" style="width: 75%;" />
+					</div>
+					
+				</form>
+
+			</div>
+			
+			<div id="dlgStyle" class="easyui-dialog"
+				data-options="closed:true,resizable:true,modal:true,fit:true,
+				buttons:[
+				{ text:'接收',iconCls:'icon-download',	    handler:function(){saveData();}                   },
+				{ text:'确认批复',iconCls:'icon-save',handler:function(){}},
+				{ text:'签收',iconCls:'icon-ok',handler:function(){}}, 
+				{ text:'转交',iconCls:'icon-next', handler:function(){}},
+				{ text:'退回',iconCls:'icon-back',handler:function(){}},
+				{ text:'取消',iconCls:'icon-cancel',	handler:function(){$('#dlgStyle').dialog('close');}    }]"
+				style="padding: 15px 15px 15px 15px;">
+
+				<form id="fm" method="post" class="row">
+
+					<div class="form-group col-lg-3 col-sm-4">
+						<label> 调度编号： </label> 
+						<input type="text" name="dm_str" class="easyui-validatebox" data-options="required:true"
+						style="width:99%;" />
+					</div>
+					<div class="form-group col-lg-3 col-sm-4">
+						<label> 创建人： </label> 
+						<input type="text" name="dm_str" class="easyui-validatebox"  style="width:99%;"/>
+					</div>
+					
+					<div class="form-group col-lg-3 col-sm-4">
+						<label> 类型： </label> 
+						<input type="text" name="apply_education" class="easyui-combobox " style="width:99%;"
+								/>
+					</div>
+					<div class="form-group col-lg-3 col-sm-4">
+						<label> 发送单位： </label> 
+						<input type="text" name="dm_str" class="org_id " style="width:99%;" />
+					</div>
+					
+					<div class="form-group col-lg-3 col-sm-4">
+						<label>签发人： </label> 
+						<input type="text" name="dm_str" class="easyui-validatebox " style="width:99%;"/>
+					</div>
+					<div class="form-group col-lg-3 col-sm-4">
+						<label> 联系人： </label> 
+						<input type="text" name="dm_str" class="easyui-validatebox " style="width:99%;"/>
+					</div>
+					<div class="form-group col-lg-3 col-sm-4">
+						<label> 抄送单位： </label> 
+						<input type="text" name="dm_str" class="org_id " style="width:99%;"/>
+					</div>
+					<div class="form-group col-lg-3 col-sm-4">
+						<label> 接收单位： </label> 
+						<input type="text" name="dm_str" class="org_id " style="width:99%;"/>
+					</div>
+					<div class="form-group col-lg-3 col-sm-4">
+						<label> 发送日期： </label> 
+						<input type="text" name="dm_date" class="easyui-datebox "  style="width:99%;"/>
+					</div>
+					<div class="form-group col-lg-3 col-sm-4">
+						<label> 发送时间： </label> 
+						<input type="text" name="dm_date" class="easyui-datebox "  style="width:99%;"/>
+					</div>
+					<div class="form-group col-lg-3 col-sm-4">
+						<label> <span class="ws-asterisk">*</span>联系电话： </label> 
+						<input type="text" name="dm_str" class="easyui-validatebox" style="width:99%;"/>
+					</div>
+					<div class="form-group col-lg-3 col-sm-4">
+						<label> 联系传真： </label> 
+						<input type="text" name="dm_str" class="easyui-validatebox" style="width:99%;"/>
+					</div>
+					<div class="form-group col-lg-3 col-sm-4">
+						<label> 接收人： </label> 
+						<input type="text" name="apply_education" class="easyui-combobox" style="width:99%;"
+						/>
+					</div>
+					<div class="form-group col-lg-3 col-sm-4">
+						<label> 接收日期： </label> 
+						<input type="text" name="dm_date" class="easyui-datebox"  style="width:99%;"/>
+					</div>
+					<div class="form-group col-lg-3 col-sm-4">
+						<label><span class="ws-asterisk">*</span>等级：</label>
+						<div>
+						<label class="ws-radio-inline">
+							<input type="radio"  value="0"> 一般
+						</label>
+						<label class="ws-radio-inline">
+							<input type="radio"  value="1"> 急
+						</label>
+						<label class="ws-radio-inline">
+							<input type="radio"  value="2"> 特急
+						</label>
+
+						</div>
+					</div>
+					<div class="form-group col-lg-3 col-sm-4">
+						<label><span class="ws-asterisk">*</span>喜好：</label>
+						<div>
+						<label class="ws-checkbox-inline">
+							<input type="checkbox"  value="5"> 吃
+						</label>
+						<label class="ws-checkbox-inline">
+							<input type="checkbox"  value="6"> 喝
+						</label>
+						<label class="ws-checkbox-inline">
+							<input type="checkbox"  value="7"> 玩
+						</label>
+						<label class="ws-checkbox-inline">
+							<input type="checkbox"  value="8"> 乐
+						</label>
+						</div>
+					</div>
+					<div class="form-group col-lg-3 col-sm-4">
+						<label> <span class="ws-asterisk">*</span>实施开始时间： </label> 
+						<input type="text" name="dm_date" class="easyui-datebox"  style="width:99%;"/>
+					</div>
+					<div class="form-group col-lg-3 col-sm-4">
+						<label> <span style="color:red;font-weight:bolder">*</span>实施结束时间： </label> 
+						<input type="text" name="dm_date" class="easyui-datebox"  style="width:99%;"/>
+					</div>
+
+					<div class="form-group col-lg-3 col-sm-4">
+						<label>附件上传：</label>
+						<input class="easyui-filebox" style="width:100%" name="file" id="file"
+							   data-options="required:true,buttonText:'选择Excel',buttonIcon:'icon-excel', prompt:'选择一个文件...' ">
+					</div>
+					<div class="form-group col-lg-3 col-sm-4">
+						<label><span style="color:red;font-weight:bolder">*</span>摘要：</label>
+						<input class="easyui-textbox" data-options="multiline:true"
+						 style="width:100%;height:100px" />
+					</div>
+					<div class="form-group col-sm-6">
+						<label><span class="ws-asterisk">*</span>内容：</label>
+						<input class="easyui-textbox" data-options="multiline:true"
+						 style="width:100%;height:100px" />
+					</div>
+
+					<div class="form-group col-sm-12">
+						<label>审批意见：</label>
+						<input class="easyui-textbox" data-options="multiline:true"
+						 style="width:100%;height:100px" />
+					</div>
+					</form>
+				</div>
+
+
+
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+$(function(){
+	//$.ui.combogrid.org(".org_id");
+})
+	function demoUserInfo(){
+		/* $.post(CTX_PATH + 'demo/demo_userinfo.json',function(result){
+			alert(JSON.stringify(result));
+		}); */
+	}
+	function doQuery() {
+		var fmdata = $("#queryfm").form2json();
+		$("#data1").datagrid("load", fmdata);
+	}
+	function doMore() {
+		$("#queryDlg").dialog("open").dialog("center");
+		$("#queryfm2").form("reset");
+	}
+	function queryMore(){
+	    var fmdata = $("#queryfm2").form2json();
+	    $("#data1").datagrid("load", fmdata);
+	    $("#queryDlg").dialog("close");
+	}
+	var url;
+	function addDemotab1() {
+		$("#dlg").dialog("open").dialog("center").dialog("setTitle", "新增tab信息");
+		$("#fm").form("reset");
+		//url = CTX_PATH + "demo/demotab1_add.json";
+	}
+
+	function editDemotab1() {
+		var row = $("#data1").datagrid("getSelected");
+		if (row) {
+			$("#dlg").dialog("open").dialog("center").dialog("setTitle",
+					"修改tab信息");
+			$("#fm").form("load", row);
+			//url = CTX_PATH + "demo/demotabl_edit.json";
+		} else {
+			$.messager.alert("警告", "请选择要修改的数据");
+		}
+	}
+	function saveData() {
+		//异步提交模式一
+		//这种模式的提交是利用隐藏iframe进行表单提交来来模拟ajax 但是在异常的情况下不能准确的返回异常信息,但是可以提交表单所有功能均能正常使用、也能上传文件
+		$.sys.fmSubmit("#fm", url, undefined, function() {
+			$("#dlg").dialog("close");
+			$("#data1").datagrid("reload");
+		}, "#addBtn");
+
+	}
+	function delDemotab1() {
+		var row = $("#data1").datagrid("getSelected");
+		if (row) {
+			$.messager.confirm("确认", "确定删除该条数据？dm_uid=" + row.dm_uid, function(
+					r) {
+				if (r) {
+					//异步提交模式二
+					//纯ajax方式提交 主要url不能以.html结尾
+					/* $.sys.dgPost(CTX_PATH + 'demo/demotab1_del.json', {
+						dm_uid : row.dm_uid
+					}, function(result) {
+						if (result.success) {
+							$.messager.show({
+								title : "成功",
+								msg : result.msg
+							});
+							$("#data1").datagrid("reload");
+						} else {
+							$.messager.show({
+								title : "错误",
+								msg : result.msg
+							});
+						}
+					}); */
+				}
+			});
+		} else {
+			$.messager.alert("提示", "请先选择一条数据");
+		}
+	}
+	
+	function easyuiStyle() {
+		$("#dlgStyle").dialog("open").dialog("center").dialog("setTitle", "easyui布局");
+		$("#fm").form("reset");
+	}
+</script>
+</html>

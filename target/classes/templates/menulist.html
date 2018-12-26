@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>menu</title>
+<link href="../easyui/themes/icon.css" rel="stylesheet" />
+<link href="../easyui/themes/bootstrap/easyui.css" rel="stylesheet" />
+<link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<script src="../jquery/jquery-1.9.1.min.js"></script>
+<script src="../bootstrap/js/bootstrap.min.js"></script>
+<script src="../easyui/jquery.easyui.min.js"></script>
+<script src="../easyui/locale/easyui-lang-zh_Cn.js"></script>
+</head>
+<body>
+<div class="container">
+		<div class="fixContainer" style="height:700px">
+			<div id="toolbar" style="padding: 10px;">
+					<a class="easyui-linkbutton" data-options="iconCls:'icon-add'" onclick="addMenu()">增加</a> 
+					<a class="easyui-linkbutton" data-options="iconCls:'icon-edit'" onclick="editMenu()">修改</a>
+					<a class="easyui-linkbutton" data-options="iconCls:'icon-remove'" onclick="delMenu()">删除</a>
+			</div>
+			<table id="data1" class="easyui-datagrid"
+				data-options="cls:'content',
+						     	fit:true,rownumbers:true,toolbar:'#toolbar',
+						     	url:'../menu/all',pagination:true,singleSelect:true">
+				<thead>
+					<tr class="header">
+						<th data-options="field:'id',align:'center',hidden:'true'"></th>
+						<th data-options="field:'menuId',align:'center',hidden:'true'"></th>
+						<th data-options="field:'parentMenuId',align:'center',hidden:'true'"></th>
+						<th data-options="field:'menuName',align:'center',width:120">菜单名称</th>
+						<th data-options="field:'menuUrl',align:'center',width:250">菜单路径</th>
+						<th data-options="field:'parentMenuName',align:'center',width:120">父菜单</th>
+					</tr>
+				</thead>
+			</table>
+
+			<!-- 编辑窗口 -->
+			<div id="dlg" class="easyui-dialog"
+				data-options="closed:true,resizable:true,modal:true,
+				buttons:[
+				{ text:'保存',iconCls:'icon-ok',	   id:'addBtn', handler:function(){saveData();}},
+				{ text:'取消',iconCls:'icon-cancel',	handler:function(){$('#dlg').dialog('close');}  }]"
+				style="width:25%;">
+
+				<form id="fm" method="post" class="easyuidlg">
+					<input type="hidden" name="id" />
+					<input type="hidden" name="menuId" />
+					<div class="form-group col-sm-12">
+						<label> 菜单名称： </label> 
+						<input type="text" name="menuName" class="easyui-textbox" />
+					</div>
+					<div class="form-group col-sm-12">
+						<label> 菜单路径： </label> 
+						<input type="text" name="menuUrl" class="easyui-textbox"/>
+					</div>
+					<div class="form-group col-sm-12">
+						<label> 父&nbsp;&nbsp;菜&nbsp;&nbsp;单： </label> 
+						<input type="text" id="parentMenuId" name="parentMenuId" class="easyui-combobox" 
+						data-options="valueField:'menuId',textField:'menuName',
+										url:'../menu/parentmenus'"/>
+					</div>
+					<div class="form-group col-sm-12">
+						<label> 排&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;序： </label> 
+						<input type="text" name="menuOrder" class="easyui-textbox" />
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+$(function(){
+	/* $("#parentMenuId").combobox({
+		url:'../menu/parentmenus',
+		valueField:'menuId',
+		textField:'menuName'
+	}); */
+})
+	var url;
+	function addMenu() {
+		$("#dlg").dialog("open").dialog("center").dialog("setTitle", "新增菜单");
+		$("#fm").form("reset");
+		url = "../menu/add";
+	}
+
+	function editMenu() {
+		var row = $("#data1").datagrid("getSelected");
+		if (row) {
+			$("#dlg").dialog("open").dialog("center").dialog("setTitle",
+					"修改菜单");
+			$("#fm").form("load", row);
+			url = "../menu/update";
+		} else {
+			$.messager.alert("警告", "请选择要修改的数据");
+		}
+	}
+	function saveData() {
+		var fmobj={};
+		var fmarr = $("#fm").serializeArray();
+		$.each(fmarr,function(i,item){
+			fmobj[item.name] = item.value;
+		})
+		$.post(url, fmobj, function(result) {
+			console.log(result);
+			$("#dlg").dialog("close");
+			$("#data1").datagrid("reload");
+			$('#parentMenuId').combobox("reload", "../menu/parentmenus");
+		});
+
+	}
+	function delMenu() {
+		var row = $("#data1").datagrid("getSelected");
+		if (row) {
+			$.messager.confirm("确认", "确定删除该条数据", function(r) {
+				if (r) {
+					$.post("../menu/delete", {id : row.id}, function(result) {
+						if (result.status = "success") {
+							$.messager.alert({
+								title : "成功",
+								msg : result.message
+							});
+							$("#data1").datagrid("reload");
+						} else {
+							$.messager.alert({
+								title : "错误",
+								msg : result.message
+							});
+						}
+					}); 
+				}
+			});
+		} else {
+			$.messager.alert("提示", "请先选择一条数据");
+		}
+	}
+</script>
+</html>

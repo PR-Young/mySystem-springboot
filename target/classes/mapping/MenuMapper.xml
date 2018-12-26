@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.mySystem.dao.MenuMapper">
+	<resultMap id="BaseResultMap"
+		type="com.example.mySystem.model.Menu">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="menu_id" property="menuId" jdbcType="VARCHAR" />
+		<result column="menu_name" property="menuName"
+			jdbcType="VARCHAR" />
+		<result column="menu_url" property="menuUrl" jdbcType="VARCHAR" />
+		<result column="parent_menu_id" property="parentMenuId"
+			jdbcType="VARCHAR" />
+		<result column="menu_order" property="menuOrder"
+			jdbcType="INTEGER" />
+		<result column="is_deleted" property="isDeleted"
+			jdbcType="INTEGER" />
+		<result column="create_time" property="createTime"
+			jdbcType="TIMESTAMP" />
+		<result column="modify_time" property="modifyTime"
+			jdbcType="TIMESTAMP" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, menu_id, menu_name, menu_url, parent_menu_id, menu_order, is_deleted,
+		create_time,
+		modify_time
+	</sql>
+	
+	<select id="selectAllMenu" resultType="com.example.mySystem.model.Menu">
+		SELECT a.id,a.menu_id menuId,a.menu_name menuName,a.menu_url menuUrl,
+			a.parent_menu_id parentMenuId,b.menu_name parentMenuName,a.menu_order menuOrder
+		FROM
+			sys_menu a
+		LEFT JOIN (
+			SELECT DISTINCT
+				menu_id,
+				menu_name
+			FROM
+				sys_menu
+		) b ON a.parent_menu_id = b.menu_id
+		WHERE
+			a.is_deleted = 1
+		ORDER BY
+			a.menu_order ASC
+	</select>
+	
+	<select id="parentMenus" resultType="com.example.mySystem.model.Menu">
+		select id,menu_id menuId,menu_name menuName,menu_order menuOrder
+		from sys_menu 
+		where is_deleted = 1
+		and (parent_menu_id is null or parent_menu_id = '')
+		order by menu_order asc
+	</select>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from sys_menu
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey"
+		parameterType="java.lang.Integer">
+		<!-- delete from sys_menu
+		where id = #{id,jdbcType=INTEGER} -->
+		update sys_menu set is_deleted = 2 where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert"
+		parameterType="com.example.mySystem.model.Menu">
+		insert into sys_menu (menu_id, menu_name,
+		menu_url, parent_menu_id, menu_order,
+		is_deleted, create_time, modify_time
+		)
+		values ( #{menuId,jdbcType=VARCHAR},
+		#{menuName,jdbcType=VARCHAR},
+		#{menuUrl,jdbcType=VARCHAR}, 
+		#{parentMenuId,jdbcType=VARCHAR}, 
+		#{menuOrder,jdbcType=INTEGER},
+		1, 
+		#{createTime,jdbcType=TIMESTAMP},
+		#{modifyTime,jdbcType=TIMESTAMP}
+		)
+	</insert>
+	<insert id="insertSelective"
+		parameterType="com.example.mySystem.model.Menu">
+		insert into sys_menu
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="menuId != null">
+				menu_id,
+			</if>
+			<if test="menuName != null">
+				menu_name,
+			</if>
+			<if test="menuUrl != null">
+				menu_url,
+			</if>
+			<if test="parentMenuId != null">
+				parent_menu_id,
+			</if>
+			<if test="menuOrder != null">
+				menu_order,
+			</if>
+			<if test="isDeleted != null">
+				is_deleted,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="modifyTime != null">
+				modify_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="menuId != null">
+				#{menuId,jdbcType=VARCHAR},
+			</if>
+			<if test="menuName != null">
+				#{menuName,jdbcType=VARCHAR},
+			</if>
+			<if test="menuUrl != null">
+				#{menuUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="parentMenuId != null">
+				#{parentMenuId,jdbcType=VARCHAR},
+			</if>
+			<if test="menuOrder != null">
+				#{menuOrder,jdbcType=INTEGER},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="modifyTime != null">
+				#{modifyTime,jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective"
+		parameterType="com.example.mySystem.model.Menu">
+		update sys_menu
+		<set>
+			<if test="menuId != null">
+				menu_id = #{menuId,jdbcType=VARCHAR},
+			</if>
+			<if test="menuName != null">
+				menu_name = #{menuName,jdbcType=VARCHAR},
+			</if>
+			<if test="menuUrl != null">
+				menu_url = #{menuUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="parentMenuId != null">
+				parent_menu_id = #{parentMenuId,jdbcType=VARCHAR},
+			</if>
+			<if test="menuOrder != null">
+				menu_order = #{menuOrder,jdbcType=INTEGER},
+			</if>
+			<if test="isDeleted != null">
+				is_deleted = #{isDeleted,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="modifyTime != null">
+				modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey"
+		parameterType="com.example.mySystem.model.Menu">
+		update sys_menu
+		set menu_name = #{menuName,jdbcType=VARCHAR},
+		menu_url = #{menuUrl,jdbcType=VARCHAR},
+		parent_menu_id = #{parentMenuId,jdbcType=VARCHAR},
+		menu_order = #{menuOrder,jdbcType=INTEGER},
+		modify_time = #{modifyTime,jdbcType=TIMESTAMP}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+</mapper>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.mySystem.dao.UserMapper">
+	<resultMap id="BaseResultMap"
+		type="com.example.mySystem.model.User">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="user_id" property="userId" jdbcType="VARCHAR" />
+		<result column="user_name" property="userName"
+			jdbcType="VARCHAR" />
+		<result column="user_password" property="userPassword"
+			jdbcType="VARCHAR" />
+		<result column="is_deleted" property="isDeleted"
+			jdbcType="INTEGER" />
+		<result column="create_time" property="createTime"
+			jdbcType="DATE" />
+		<result column="modify_time" property="modifyTime"
+			jdbcType="DATE" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, user_id, user_name, user_password, is_deleted,
+		create_time,
+		modify_time
+	</sql>
+	<select id="selectAllUser" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from sys_user
+	</select>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from sys_user
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey"
+		parameterType="java.lang.Integer">
+		delete from sys_user
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert"
+		parameterType="com.example.mySystem.model.User">
+		insert into sys_user (id, user_id, user_name,
+		user_password, is_deleted, create_time,
+		modify_time)
+		values
+		(#{id,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR},
+		#{userName,jdbcType=VARCHAR},
+		#{userPassword,jdbcType=VARCHAR},
+		#{isDeleted,jdbcType=INTEGER}, #{createTime,jdbcType=DATE},
+		#{modifyTime,jdbcType=DATE})
+	</insert>
+	<insert id="insertSelective"
+		parameterType="com.example.mySystem.model.User">
+		insert into sys_user
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="userId != null">
+				user_id,
+			</if>
+			<if test="userName != null">
+				user_name,
+			</if>
+			<if test="userPassword != null">
+				user_password,
+			</if>
+			<if test="isDeleted != null">
+				is_deleted,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="modifyTime != null">
+				modify_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="userId != null">
+				#{userId,jdbcType=VARCHAR},
+			</if>
+			<if test="userName != null">
+				#{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="userPassword != null">
+				#{userPassword,jdbcType=VARCHAR},
+			</if>
+			<if test="isDeleted != null">
+				#{isDeleted,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=DATE},
+			</if>
+			<if test="modifyTime != null">
+				#{modifyTime,jdbcType=DATE},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective"
+		parameterType="com.example.mySystem.model.User">
+		update sys_user
+		<set>
+			<if test="userId != null">
+				user_id = #{userId,jdbcType=VARCHAR},
+			</if>
+			<if test="userName != null">
+				user_name = #{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="userPassword != null">
+				user_password = #{userPassword,jdbcType=VARCHAR},
+			</if>
+			<if test="isDeleted != null">
+				is_deleted = #{isDeleted,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=DATE},
+			</if>
+			<if test="modifyTime != null">
+				modify_time = #{modifyTime,jdbcType=DATE},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey"
+		parameterType="com.example.mySystem.model.User">
+		update sys_user
+		set user_id = #{userId,jdbcType=VARCHAR},
+		user_name = #{userName,jdbcType=VARCHAR},
+		user_password =
+		#{userPassword,jdbcType=VARCHAR},
+		is_deleted =
+		#{isDeleted,jdbcType=INTEGER},
+		create_time =
+		#{createTime,jdbcType=DATE},
+		modify_time = #{modifyTime,jdbcType=DATE}
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+</mapper>
